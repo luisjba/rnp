@@ -26,4 +26,8 @@ dependencies:
   - wheel
   - wrapt
   - docopt
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - opencv
   
