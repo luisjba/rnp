@@ -5,6 +5,76 @@ with experimentation and research with Neural Networks in
 my learning proccess for the Subject of **Deep Neural Network**
 of the Mater Degree in Data Science by the "Universidad de Sonora".
 
+# Python environment for Acarus
+
+Download the [environment.yml](https://raw.githubusercontent.com/luisjba/rnp/master/environment.yml) 
+file thta contains the requiered python package to install in out environment.
+
+```bash
+curl https://raw.githubusercontent.com/luisjba/rnp/master/environment.yml --output environment.yml
+Collecting package metadata (repodata.json): done
+Solving environment: done
+
+Downloading and Extracting Packages
+ipython-8.0.1        | 1.1 MB    | ################################################################################################################################################ | 100% 
+libffi-3.4.2         | 57 KB     | ################################################################################################################################################ | 100%
+.
+.
+.
+.
+tomli-2.0.1          | 16 KB     | ################################################################################################################################################ | 100% 
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+#
+# To activate this environment, use
+#
+#     $ conda activate tf_acarus
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+```
+
+Create the python environment with conda form the [environment.yml](environment.yml) file.
+
+```bash
+conda env create --file=environment.yml --name tf_acarus
+```
+Once you run the previos commnd, you have to wait to conda install and prepare the environment
+with the packages present in the `environment.yml` file.
+
+To activate the new `tf_acarus` environmet just created, use the `ativate` conda command and
+pass the envoronment name as argument.
+
+```bash
+conda activate tf_acarus
+```
+To deactivate the `tf_acarus` environment, use `conda deactivate` and the base environment 
+will be activated.
+
+Pip need to be upgraded in order to install aditional and latest essential packages.
+
+
+```bash
+python -m pip install -U pip
+# Other essential packages
+conda install -c conda-forge matplotlib -y
+conda install -c conda-forge scikit-learn -y
+conda install -c conda-forge opencv -y
+conda install -c conda-forge pandas -y
+```
+
+To finish, we have to install Tensorflow
+
+```bash
+python -m pip install tensorflow
+
+```
+
+To show the list of Pyhon Packages installed in the environment, run `conda list`.
+
+
 # MNIST Handwriting digits
 
 TensorFlow version 2.7.0 is used to implement the NN building. The code implementation was made as module in the file [`nn_mnist_model.py`](nn_mnist_model.py) and usage
