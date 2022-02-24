@@ -13,10 +13,10 @@ EPOCHS=200
 BATCH_SIZE=128
 models_layers_conf = [
     [],                                 # The default, with no hidden layers
-    # [[128,'relu']],                     # One hidden layer with 128 units and 'relu' activation
-    # [[128,'relu'],[64,'relu']],
-    # [[128,'relu'],[128,'relu']],
-    # [[128,'relu'],[128,'relu'],[64,'relu']],
+    [[128,'relu']],                     # One hidden layer with 128 units and 'relu' activation
+    [[128,'relu'],[64,'relu']],
+    [[128,'relu'],[128,'relu']],
+    [[128,'relu'],[128,'relu'],[64,'relu']],
 ]
 
 models_list = []
@@ -45,10 +45,10 @@ for m_dict in models_list:
 # Plot All learning Curve
 plot_rows = len(models_list)
 plot_cols = 2
-fig, axs = plt.subplots(plot_rows, plot_cols, figsize=(16,8))
+fig, axs = plt.subplots(plot_rows, plot_cols, figsize=(16, 5 * plot_rows))
 # Superior Title
 fig.suptitle("Learning Curve", fontsize=18, fontweight='bold')
-fig.tight_layout()
+# fig.tight_layout()
 for i in range(plot_rows):
     offset_index = i * plot_cols
     ax_acc, ax_loss = axs.flat[offset_index:offset_index+2]
