@@ -29,7 +29,11 @@ __maintainer__ = 'Jose Luis Bracamonte Amavizca'
 __email__ = 'luisjba@gmail.com'
 __status__ = 'Development'
 
+from cProfile import label
 import datetime, ast
+from statistics import mode
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 import tensorflow as tf
 import numpy as np
 from tensorflow import keras
@@ -42,7 +46,8 @@ class MNISTModel():
     def __init__(self, 
             epochs:int=200,
             batch_size:int=128,
-            verbose:int = 1
+            verbose:int = 1,
+            auto_load_data=False
         ) -> None:
         self.epochs:int = epochs
         self.batch_size:int = batch_size
@@ -58,6 +63,10 @@ class MNISTModel():
         self.load_data()
         # Initialize NN model
         self.model:tf.keras.Model = tf.keras.models.Sequential()
+        # To store the train history
+        self.history = []
+        if auto_load_data:
+            self.load_data()
     
 
     def load_data(self) -> None:
@@ -79,7 +88,7 @@ class MNISTModel():
         self.Y_train = keras.utils.to_categorical(self.Y_train, self.nb_classes)
         self.Y_test = keras.utils.to_categorical(self.Y_test, self.nb_classes)
 
-    def get_sample_images(self, n:int=9, cols:int=3) -> tuple:
+    def get_sample_images(self, n:int=18, cols:int=6) -> tuple:
         """Get the  fig and axs for image ploting
         
         :param n: the number of images to take
@@ -89,7 +98,7 @@ class MNISTModel():
         """
         last_blank_cols = n % cols
         plot_rows = int(n/cols) + last_blank_cols
-        fig, axs = plt.subplots(plot_rows, cols, figsize=(12,12), tight_layout=True)
+        fig, axs = plt.subplots(plot_rows, cols, figsize=(6,6), tight_layout=True)
         fig.suptitle('MNIST images', fontsize=18, fontweight='bold')
         fig.tight_layout()
         # Get the sample number
@@ -112,6 +121,62 @@ class MNISTModel():
         for i in range(last_blank_cols):
             axs.flat[-(i+1)].axis('off') # clear existing plot
         return fig, axs
+
+    def add_acc_plot(self, fig:Figure, ax:Axes) -> tuple:
+        """Add the accuracy plot """
+        plot_tile = "Accuracy"
+        if len(self.model.layers) > 1:
+            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
+        acc = self.history.history["accuracy"]
+        val_acc = self.history.history['val_accuracy']
+        epochs = self.history.params["epochs"]
+        epochs_line = range(epochs)
+        ax.set_title(plot_tile)
+        ax.plot(epochs_line, acc, label="Train")
+        ax.plot(epochs_line, val_acc, label="Validation")
+        ax.legend(loc="lower right")
+
+    def add_loss_plot(self, fig:Figure, ax:Axes) -> tuple:
+        """Add the loss plot """
+        plot_tile = "Loss"
+        if len(self.model.layers) > 1:
+            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
+        loss = self.history.history["loss"]
+        val_loss = self.history.history['val_loss']
+        epochs = self.history.params["epochs"]
+        epochs_line = range(epochs)
+        ax.set_title(plot_tile)
+        ax.plot(epochs_line, loss, label="Train")
+        ax.plot(epochs_line, val_loss, label="Validation")
+        ax.legend(loc="upper right")
+
+    def add_learning_curve_plots(self, fig:Figure, ax_acc:Axes, ax_loss:Axes):
+        """Adding the Learning Cuerve to the corresponding sub plot
+        
+        :param ax_acc:Axes The Axes object to plot the Accuracy data
+        :param ax_loss:Axes The Axes object to plot the Loss data
+
+        :return fig:Figure The Figure object 
+        :return (ax_acc,ax_loss: The tuple of axes for Accuracy and Loss
+        """
+        self.add_acc_plot(fig, ax_acc)
+        self.add_loss_plot(fig, ax_loss)
+        return fig, (ax_acc,ax_loss)
+
+    def get_learning_curve_plots(self):
+        """Generate the plots for Learning cuerve
+
+        :return fig:Figure The Figure object 
+        :return (ax_acc,ax_loss: The tuple of axes for Accuracy and Loss
+        """
+        fig, axs = plt.subplots(1, 2, figsize=(16,8))
+        ax_acc, ax_loss = axs.flat[:2]
+        # Superior Title
+        fig.suptitle("Learning Curve", fontsize=18, fontweight='bold')
+        fig.tight_layout()
+        self.add_learning_curve_plots(fig, ax_acc, ax_loss)
+        return fig, (ax_acc,ax_loss)
+
 
     def build(self, hidden_layers:list=[]) -> None:
         """Build the model with the corresponding layers.
@@ -160,10 +225,22 @@ class MNISTModel():
     def log_dir(self) -> str:
         return "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
+    @property
+    def descriptive_name(self):
+        """Return the desciptive name base on the layers configuration"""
+        if len(self.model.layers) < 2:
+            return ""
+        name = ""
+        for layer in self.model.layers[1:]:
+            l_conf = layer.get_config()
+            name = "{}__{}_{}".format(name, l_conf["units"], l_conf["activation"])
+        return name
+
+
     def fit(self):
         tf.config.set_soft_device_placement(True)
         fit_callback = tf.keras.callbacks.TensorBoard(log_dir=self.log_dir, histogram_freq=1)
-        self.model.fit(
+        self.history = self.model.fit(
             x = self.X_train, 
             y = self.Y_train,
             batch_size = self.batch_size,
