@@ -124,28 +124,28 @@ class MNISTModel():
 
     def add_acc_plot(self, fig:Figure, ax:Axes) -> tuple:
         """Add the accuracy plot """
-        plot_tile = "Accuracy"
-        if len(self.model.layers) > 1:
-            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
         acc = self.history.history["accuracy"]
         val_acc = self.history.history['val_accuracy']
         epochs = self.history.params["epochs"]
-        epochs_line = range(epochs)
+        plot_tile = "Accuracy -> T:{:.2f}%, V:{:.2f}% ".format(acc[-1]*100, val_acc[-1]*100)
+        if len(self.model.layers) > 1:
+            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
         ax.set_title(plot_tile)
+        epochs_line = range(epochs)
         ax.plot(epochs_line, acc, label="Train")
         ax.plot(epochs_line, val_acc, label="Validation")
         ax.legend(loc="lower right")
 
     def add_loss_plot(self, fig:Figure, ax:Axes) -> tuple:
         """Add the loss plot """
-        plot_tile = "Loss"
-        if len(self.model.layers) > 1:
-            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
         loss = self.history.history["loss"]
         val_loss = self.history.history['val_loss']
         epochs = self.history.params["epochs"]
-        epochs_line = range(epochs)
+        plot_tile = "Loss -> T:{:.2f}%, V:{:.2f}% ".format(loss[-1]*100, val_loss[-1]*100)
+        if len(self.model.layers) > 1:
+            plot_tile = "{} {}".format(plot_tile, self.descriptive_name)
         ax.set_title(plot_tile)
+        epochs_line = range(epochs)
         ax.plot(epochs_line, loss, label="Train")
         ax.plot(epochs_line, val_loss, label="Validation")
         ax.legend(loc="upper right")
@@ -223,7 +223,8 @@ class MNISTModel():
 
     @property
     def log_dir(self) -> str:
-        return "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        """Return the log dir"""
+        return "logs/fit/{}{}".format(self.descriptive_name ,datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     @property
     def descriptive_name(self):
@@ -231,7 +232,7 @@ class MNISTModel():
         if len(self.model.layers) < 2:
             return ""
         name = ""
-        for layer in self.model.layers[1:]:
+        for layer in self.model.layers[1:-1]:
             l_conf = layer.get_config()
             name = "{}__{}_{}".format(name, l_conf["units"], l_conf["activation"])
         return name
