@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from nn_mnist_model import MNISTModel
 import datetime
 
-EPOCHS=200,
+EPOCHS=200
 BATCH_SIZE=128
 models_layers_conf = [
     [],                                 # The default, with no hidden layers
