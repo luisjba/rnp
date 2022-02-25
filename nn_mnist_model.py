@@ -36,6 +36,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 import tensorflow as tf
 import numpy as np
+import pandas as pd
 from tensorflow import keras
 import matplotlib.pyplot as plt
 from keras.datasets import mnist
@@ -88,7 +89,7 @@ class MNISTModel():
         self.Y_train = keras.utils.to_categorical(self.Y_train, self.nb_classes)
         self.Y_test = keras.utils.to_categorical(self.Y_test, self.nb_classes)
 
-    def get_sample_images(self, n:int=18, cols:int=6) -> tuple:
+    def get_sample_images(self, n:int=40, cols:int=8) -> tuple:
         """Get the  fig and axs for image ploting
         
         :param n: the number of images to take
@@ -98,7 +99,7 @@ class MNISTModel():
         """
         last_blank_cols = n % cols
         plot_rows = int(n/cols) + last_blank_cols
-        fig, axs = plt.subplots(plot_rows, cols, figsize=(6,6), tight_layout=True)
+        fig, axs = plt.subplots(plot_rows, cols, figsize=(16, 16), tight_layout=True)
         fig.suptitle('MNIST images', fontsize=18, fontweight='bold')
         fig.tight_layout()
         # Get the sample number
@@ -177,6 +178,12 @@ class MNISTModel():
         self.add_learning_curve_plots(fig, ax_acc, ax_loss)
         return fig, (ax_acc,ax_loss)
 
+    def history_to_csv(self) -> None:
+        """Save the train History (loss, accuracy, val_loss, val_accuracy)
+        into a CSV file
+        """
+        history_df = pd.DataFrame(self.history.history)
+        history_df.to_csv("history_{}.csv".format(self.descriptive_name))
 
     def build(self, hidden_layers:list=[]) -> None:
         """Build the model with the corresponding layers.
