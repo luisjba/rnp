@@ -41,6 +41,8 @@ for hidden_l in models_layers_conf:
 # Train each model
 for m_dict in models_list:
     m_dict["model"].fit()
+    # save the training history 
+    m_dict["model"].history_to_csv()
 
 # Plot All learning Curve
 plot_rows = len(models_list)
