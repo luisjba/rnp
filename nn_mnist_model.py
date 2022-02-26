@@ -183,7 +183,7 @@ class MNISTModel():
         into a CSV file
         """
         history_df = pd.DataFrame(self.history.history)
-        history_df.to_csv("history_{}.csv".format(self.descriptive_name))
+        history_df.to_csv("history{}.csv".format(self.descriptive_name))
 
     def build(self, hidden_layers:list=[]) -> None:
         """Build the model with the corresponding layers.
@@ -239,7 +239,7 @@ class MNISTModel():
         if len(self.model.layers) < 2:
             return ""
         name = ""
-        for layer in self.model.layers[1:-1]:
+        for layer in self.model.layers[:-1]:
             l_conf = layer.get_config()
             name = "{}__{}_{}".format(name, l_conf["units"], l_conf["activation"])
         return name
